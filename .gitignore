@@ -1,3 +1,7 @@
+# xmalloc
+/xmalloc
+/xmalloc.log
+
 # Prerequisites
 *.d
 
