@@ -23,7 +23,7 @@ gcc YOURPROJECT.c xmalloc -o YOURPROJECT
 ```
 
 Example Output for `YOURPROJECT`
-```bash
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include "xmalloc.h"
