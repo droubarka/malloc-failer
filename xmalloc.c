@@ -8,8 +8,16 @@
 #define SPECIFICLINES
 #endif
 
+#ifndef COUNTER
+#define COUNTER 0
+#endif
+
 #ifndef LOGFILE
 #define LOGFILE "xmalloc.log"
+#endif
+
+#ifndef STDERR_FD
+#define STDERR_FD 2
 #endif
 
 static int logfile = -1;
@@ -32,13 +40,14 @@ static void xmalloc_atexit(void)
 {
 	char *format = "\nxmalloc: note: Log has been successfully saved to %s\n";
 
-	dprintf(2, format, LOGFILE);
+	dprintf(STDERR_FD, format, LOGFILE);
 	close(logfile);
 }
 
 void *xmalloc(size_t xsize, char *file, const char *function, unsigned int line)
 {
 	unsigned int specific_lines[] = {SPECIFICLINES};
+	static unsigned int counter = COUNTER;
 	size_t size = sizeof(specific_lines) / sizeof(unsigned int);
 
 	if (logfile == -1)
@@ -50,12 +59,13 @@ void *xmalloc(size_t xsize, char *file, const char *function, unsigned int line)
 
 	char *format = "xmalloc: %s:%s:%u: unable to allocate %zu Bytes\n";
 
-	if (get_index(specific_lines, size, line) != -1)
+	if (counter <= 0 && get_index(specific_lines, size, line) != -1)
 	{
-		dprintf(2, format, file, function, line, xsize);
+		dprintf(STDERR_FD, format, file, function, line, xsize);
 		if (logfile != -1)
 			dprintf(logfile, format, file, function, line, xsize);
 		return NULL;
 	}
+	counter--;
 	return malloc(xsize);
 }
